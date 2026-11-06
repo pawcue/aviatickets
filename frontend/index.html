@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✈️</text></svg>">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Aviatickets – book your seat</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="top">
+    <div class="wrap">
+      <h1>Aviatickets</h1>
+      <p>Pick a flight, pick your seat. No payment needed.</p>
+    </div>
+  </header>
+
+  <main class="wrap">
+
+    <!-- Step 1: flights -->
+    <section id="flights-section">
+      <h2>Upcoming flights</h2>
+      <div id="flights" class="flights"></div>
+    </section>
+
+    <!-- Step 2: seat map + passenger form (hidden until a flight is chosen) -->
+    <section id="booking-section" hidden>
+      <button id="back-btn" class="link-btn" type="button">‹ Back to flights</button>
+      <h2 id="booking-title"></h2>
+
+      <div class="booking-grid">
+        <div>
+          <ul class="legend">
+            <li><span class="seat-sample free"></span>Free</li>
+            <li><span class="seat-sample selected"></span>Your seat</li>
+            <li><span class="seat-sample taken"></span>Taken</li>
+          </ul>
+          <div id="plane" class="plane" aria-label="Seat map"></div>
+        </div>
+
+        <form id="booking-form" class="card" novalidate>
+          <h3>Passenger details</h3>
+          <p id="chosen-seat" class="chosen-seat">Select a seat on the plane</p>
+
+          <label for="name">Full name</label>
+          <input id="name" type="text" autocomplete="name" placeholder="Anna Schmidt" required>
+
+          <label for="email">Email</label>
+          <input id="email" type="email" autocomplete="email" placeholder="anna@example.com" required>
+
+          <p id="form-error" class="error" role="alert"></p>
+          <button id="book-btn" class="btn" type="submit" disabled>Book this seat</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- Step 3: confirmation -->
+    <section id="done-section" class="card done" hidden>
+      <h2>Seat booked</h2>
+      <p>Your booking code:</p>
+      <p id="done-code" class="code"></p>
+      <p id="done-text"></p>
+      <button id="again-btn" class="btn" type="button">Book another seat</button>
+    </section>
+
+    <!-- Find / cancel a booking -->
+    <section class="card lookup">
+      <h2>Find your booking</h2>
+      <form id="lookup-form" class="lookup-form">
+        <input id="lookup-code" type="text" maxlength="6" placeholder="Booking code, e.g. K7X2QP" required>
+        <button class="btn" type="submit">Find booking</button>
+      </form>
+      <p id="lookup-error" class="error" role="alert"></p>
+      <div id="lookup-result" hidden>
+        <dl id="lookup-details" class="details"></dl>
+        <button id="cancel-btn" class="btn danger" type="button">Cancel booking</button>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
