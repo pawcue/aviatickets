@@ -1,0 +1,8 @@
+# Tells Grafana to load every dashboard JSON from this folder (mounted in docker-compose.yml).
+apiVersion: 1
+providers:
+  - name: aviatickets
+    type: file
+    allowUiUpdates: true
+    options:
+      path: /var/lib/grafana/dashboards
