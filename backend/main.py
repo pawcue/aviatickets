@@ -7,6 +7,8 @@ from pathlib import Path
 from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
 from psycopg.errors import UniqueViolation
+from prometheus_client import Counter
+from prometheus_fastapi_instrumentator import Instrumentator
 from pydantic import BaseModel, Field
 
 from db import get_connection, init_db
@@ -21,6 +23,15 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="Aviatickets", lifespan=lifespan)
+
+# ---------- Metrics (Prometheus) ----------
+# Automatic HTTP metrics (requests, status codes, latency) and the GET /metrics endpoint
+Instrumentator(excluded_handlers=["/metrics"]).instrument(app).expose(app, include_in_schema=False)
+
+# Our own business metrics (counters only grow; Prometheus computes rates from them)
+BOOKINGS_CREATED = Counter("aviatickets_bookings_created_total", "Seats booked")
+BOOKINGS_CANCELLED = Counter("aviatickets_bookings_cancelled_total", "Bookings cancelled")
+BOOKING_CONFLICTS = Counter("aviatickets_booking_conflicts_total", "Attempts to book an already taken seat")
 
 
 # ---------- Helpers ----------
@@ -113,8 +124,10 @@ def create_booking(data: BookingRequest):
             )
     except UniqueViolation:
         # UNIQUE (flight_id, seat) in schema.sql fired: someone was faster.
+        BOOKING_CONFLICTS.inc()
         raise HTTPException(409, f"Seat {data.seat} was just taken. Please pick another one.")
 
+    BOOKINGS_CREATED.inc()
     return {"booking_code": code, "seat": data.seat}
 
 
@@ -144,6 +157,7 @@ def cancel_booking(code: str):
         ).fetchone()
     if deleted is None:
         raise HTTPException(404, "Booking not found. Check the code and try again.")
+    BOOKINGS_CANCELLED.inc()
     return {"status": "cancelled"}
 
 
